@@ -13,6 +13,14 @@ typedef struct symbol {
  int addr; // M address
 } symbol;
 
+// String array of the four error types
+static char* errors[] = {"Error: identifier does not start with a letter", 
+                         "Error: identifier too long", 
+                         "Error: number greater than 2^16-1",
+                         "Error: invalid token",
+                     	 "Empty file given"};
+
+
 int main(int argc, char *argv[])
 {	
 	if(argc != 3)
@@ -24,7 +32,13 @@ int main(int argc, char *argv[])
 	FILE *inputFile = fopen(argv[1], "r");
 	FILE *outputFile = fopen(argv[2], "w");
 	
-	char* error = lex(inputFile);
+	int errorFlag = lex(inputFile);
+
+	if(errorFlag >= 0)
+	{
+		printf("%s\n", errors[errorFlag]);
+		return 0;
+	}
 	
 	FILE* Tokens = fopen("TokenFormat.txt", "r");
 	PlaceToks();

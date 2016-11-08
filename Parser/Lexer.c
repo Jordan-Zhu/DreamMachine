@@ -123,15 +123,15 @@ void TokenFormat(FILE *f)
     return;
 }
 
-// Function to parse every string from the input file, and add repsective tokens to tokenFile
+// Function to tokenize every string from the input file, and add repsective tokens to tokenFile
 int tokenize(char word[], FILE* tokenFile)
 {
 	// Checks if word is reserved or arithmatic
 	if(checkReserved(word, tokenFile))
-		return 0;
+		return -1;
 	
 	if(checkArith(word, tokenFile))
-		return 0;
+		return -1;
 
 	// If not reserved/arithmatic, splits word into substrings of (letters and numbers) or (symbols)
 	int i = 0;
@@ -139,7 +139,8 @@ int tokenize(char word[], FILE* tokenFile)
 	int buffPos = 0;
 	int strPos = 0;
 	char buffs[100][100];
-	int errorFlag = 0;
+	char tempStr[3];
+	int errorFlag = -1;
 	
 
 	while(i < strlen(word))
@@ -193,16 +194,67 @@ int tokenize(char word[], FILE* tokenFile)
 			// must be an invalid token, error thrown. Move to next substring 
 			if(!isalpha((buffs[i][0])))
 			{
-				
-				errorFlag = 4;
-				continue;
+				for(j = 0; j < strlen(buffs[i]); j++)
+				{
+					if(buffs[i][j] == ':')
+					{
+						if(j + 1 < strlen(buffs[i]) && buffs[i][j+1] == '=')
+						{
+							tempStr[0] = buffs[i][j];
+							tempStr[1] = buffs[i][j+1];
+							tmepStr[2] = '\0';
+							checkArith(tmepStr, tokenFile);
+							j++;
+							continue;
+						}
+					}
+					else if(buffs[i][j] == '<')
+					{
+						if(j + 1 < strlen(buffs[i]) && buffs[i][j+1] == '=')
+						{
+							tempStr[0] = buffs[i][j];
+							tempStr[1] = buffs[i][j+1];
+							tmepStr[2] = '\0';
+							checkArith(tmepStr, tokenFile);
+							j++;
+							continue;
+						}
+						else if(j + 1 < strlen(buffs[i]) && buffs[i][j+1] == '>')
+						{
+							tempStr[0] = buffs[i][j];
+							tempStr[1] = buffs[i][j+1];
+							tmepStr[2] = '\0';
+							checkArith(tmepStr, tokenFile);
+							j++;
+							continue;
+						}
+					}
+					else if(buffs[i][j] == '>')
+					{
+						if(j + 1 < strlen(buffs[i]) && buffs[i][j+1] == '=')
+						{
+							tempStr[0] = buffs[i][j];
+							tempStr[1] = buffs[i][j+1];
+							tmepStr[2] = '\0';
+							checkArith(tmepStr, tokenFile);
+							j++;
+							continue;
+						}
+					}
+
+					tempStr[0] = buffs[i][j];
+					tempStr[1] = '\0';
+					tmepStr[2] = '\0';
+
+					if(!checkArith(tempStr, tokenFile))
+						return 3;
+				}
 			}
 
 			// I variable name larger than 12 characters, error thrown. Move to next substring
 			if(strlen(buffs[i]) > 12)
 			{
-				errorFlag = 2;
-				continue;
+				return 1;
 			}
 
 			// Add valid variable name to tokenFile
@@ -217,16 +269,14 @@ int tokenize(char word[], FILE* tokenFile)
 			{
 				if(isalpha(buffs[i][j]))
 				{
-					errorFlag = 1;
-					continue;
+					return 0;
 				}
 			}
 
 			// If number larger than 2^16 - 1, error thrown
 			if(atoi(buffs[i]) > 65535)
 			{
-				errorFlag = 3;
-				continue;
+				return 2;
 			}
 
 			// Add valid integer to tokenFile
@@ -268,9 +318,9 @@ void run(FILE *input)
 }
 
 
-char* lex(FILE *pl0File)
+int lex(FILE *pl0File)
 {
-	int errorFlag = 0;
+	int errorFlag = -1;
 	char buff[1024];
 	char holder;
 	FILE *input;
@@ -287,7 +337,7 @@ char* lex(FILE *pl0File)
 	if(fscanf(cleanFile, "%s", buff) == EOF)
 	{
 		fprintf(tokenFile,"%s\t\t%d\n", "/0", 1);
-		return 0; 
+		return 4; 
 	}
 	
 	// Parses tokens from the beginning of cleanFile
@@ -299,14 +349,13 @@ char* lex(FILE *pl0File)
 		{
 			errorFlag = tokenize(buff, tokenFile);
 
-			// Prints error message if error occurs
-			if(errorFlag > 0)
-				printf("%s\n", errors[errorFlag - 1]);
+			if(errorFlag >= 0)
+				return errorFlag;
 		}
 
 		// Closes and opens tokenFile to be read from
-		fclose(tokenFile);
-		tokenFile = fopen("tokens.txt", "r");
+		//fclose(tokenFile);
+		//tokenFile = fopen("tokens.txt", "r");
 
 		// Prints tokens if no errors found
 		// if(errorFlag == 0)
@@ -328,5 +377,5 @@ char* lex(FILE *pl0File)
 	tokenFile = fopen("tokens.txt", "r");
 	TokenFormat(tokenFile);
 
-	return 0;
+	return -1;
 }
