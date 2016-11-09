@@ -1,1 +1,1 @@
-char* lex(FILE *pl0File);
+int lex(FILE *pl0File);

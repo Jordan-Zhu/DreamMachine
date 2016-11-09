@@ -6,6 +6,14 @@
  
 #define MAX 1000
 
+typedef struct symbol {
+ int kind; // const = 1, var = 2, proc = 3
+ char name[12]; // name up to 11 chars
+ int val; // number (ASCII value)
+ int level; // L level
+ int addr; // M address
+} symbol;
+
 //Global token array to store tokens.
 static int Tokens[MAX];
 //Global string array to store identfiers and digits.
@@ -18,6 +26,8 @@ static int tokPointer = -1;
 static int token;
 //Count to determine if errors were found in code.
 static int errorFound = 0;
+//Declare sysmbol table.
+static struct symbol table[MAX];
 
 typedef enum {
 
@@ -134,14 +144,20 @@ void error(int errorNum){
 		case 27:
             printf("End symbol was espected.\n");
             break;
+		case 28: 
+			printf("Identifier was espected.\n");
+			break;
         default:
             break;
 
         }
+		printf("Current Tok = %d", Tokens[tokPointer]);
+		fflush(stdout);
+		exit(EXIT_FAILURE);
 		//Increment error numbers.
-		errorFound++;
+		//errorFound++;
 		//Decreases token despite errors to continue checking for more.
-		tokPointer--;
+		//tokPointer--;
 		
 		return;
 }
@@ -167,6 +183,13 @@ void PlaceToks()
     return;
 
 }
+void enter(){
+	
+	
+	
+	
+	
+}
 void getToken(){
 	
 	//Pointer is incremented.
@@ -189,12 +212,10 @@ void program()
 	//Get the token
 	getToken();
 	//Function call to Block
-	block();
+	block(0);
 	
 		if (token != periodsym)
 		{
-			
-			//Error
 			error(9);
 		}
 		
@@ -204,7 +225,7 @@ void program()
 	
 	return;
  }
- void block()
+ void block(int level)
  {
  
 	 if (token == constsym)
@@ -245,9 +266,10 @@ void program()
 			if (token != identsym)
 			{
 			
-				error(14);
+				error(28);
 			} 
 			getToken();
+	
 		 }while(token == commasym);
 		 
 		 if(token != semicolonsym)
@@ -261,7 +283,7 @@ void program()
 		getToken();
 		if (token != identsym)
 		{
-			error(14);
+			error(28);
 		}
 		getToken();
 		if (token != semicolonsym)
@@ -269,7 +291,7 @@ void program()
 			error(5);
 		} 
 		getToken();
-		block();
+		block(level + 1);
 		if(token != semicolonsym) 
 		{
 			error(5);
@@ -287,7 +309,7 @@ void program()
 		 getToken();
 		 if (token != becomessym)
 		 {
-			 //then ERROR
+			error(13);
 		 }
 		 getToken();
 		 expression();
@@ -322,7 +344,7 @@ void program()
 			 condition();
 			 if(token != thensym)
 			 { 
-				 //then error
+				 error(16);
 			 }
 			getToken();
 			statement();
@@ -333,7 +355,7 @@ void program()
 			 condition();
 			 if (token != dosym)
 				{			 
-				//then ERROR;
+				error(18);
 				}
 			getToken();
 			statement();
@@ -348,7 +370,7 @@ void program()
 			getToken();
 			if(token != semicolonsym)
 			{
-				//then error
+				error(5);
 			}
 			getToken();
 			statement();
@@ -362,7 +384,7 @@ void program()
 			}
 			getToken();
 			if(token != semicolonsym){
-				//then error
+				error(5);
 			}
 			getToken();
 			statement();
@@ -378,9 +400,9 @@ void program()
 	 else
 	 {
 		 expression();
-		 if((token != lessym) || (token != gtrsym) || (token != geqsym) || (token != leqsym) || (token != eqsym) || (token != neqsym))
+		 if(!((token == lessym) || (token == gtrsym) || (token == geqsym) || (token == leqsym) || (token == eqsym) || (token == neqsym)))
 		 {
-			 //then error
+			 error(20);
 		 }
 		 getToken();
 		 expression();
@@ -430,13 +452,13 @@ void factor(){
 		expression();
 		if(token != rparentsym)
 		{
-			//then error
+			error(22);
 		}
 		getToken();
 	 } 
 	 else
 	 {
-		 //error
+		 error(24);
 	 }
 	 
 	 return;

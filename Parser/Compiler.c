@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,13 +6,6 @@
 #include "Parse.h"
 #include "Lexer.h"
 
-typedef struct symbol {
- int kind; // const = 1, var = 2, proc = 3
- char name[12]; // name up to 11 chars
- int val; // number (ASCII value)
- int level; // L level
- int addr; // M address
-} symbol;
 
 // String array of the four error types
 static char* errors[] = {"Error: identifier does not start with a letter", 
@@ -42,7 +36,6 @@ int main(int argc, char *argv[])
 	
 	FILE* Tokens = fopen("TokenFormat.txt", "r");
 	PlaceToks();
-	PrintToks();
 	program();
 	
 	fclose(inputFile);
