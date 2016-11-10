@@ -1,16 +1,17 @@
 Changes made:
-	- Header file runs parse(); instead of program();
-	- parse function initializes the symbol_table array and the instruction (PM/0) code array 
+- Header file runs parse(); instead of program();
+- parse function initializes the symbol_table array and the instruction (PM/0) code array 
 	and calls program()
 
 TO-DO (imo):
-	- Create data structure storing values of opcode instructions and their numeric values
-	(numbers for assembly functions are from ISA) (e.g. LOD is 3 and STO is 4).
-	(enum assigns every value a number, so maybe use an enum for this?)
-	- Keep track of the level
-	- Enter constants and variables into symbol table.
-	The thing with enter() is sometimes it needs different amounts of parameters beyond
-	variable type and ident name. 
+- Create data structure storing values of opcode instructions and their numeric values
+(numbers for assembly functions are from ISA) (e.g. LOD is 3 and STO is 4).
+(enum assigns every value a number, so maybe use an enum for this?)
+- Keep track of the level
+- Enter constants and variables into symbol table.
+The thing with enter() is sometimes it needs different amounts of parameters beyond
+variable type and ident name. 
+- other things I'm forgetting
 
 
 ---------------------------------------
